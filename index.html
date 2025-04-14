@@ -35,7 +35,6 @@
       background-color: #e7dbc4;
     }
 
-    /* ✅ Ajout ici */
     .marker-popup {
       max-width: 250px;
       min-width: 180px;
@@ -47,7 +46,6 @@
       font-size: 16px;
     }
 
-    /* ✅ Amélioration ici */
     .marker-popup p.note-text {
       margin-bottom: 8px;
       white-space: pre-wrap;
@@ -149,6 +147,22 @@
       .then(data => {
         data.forEach(addMarker);
       });
+    // Affiche un popup de bienvenue à l'ouverture
+    map.once('load', function () {
+      const welcomePopup = L.popup()
+        .setLatLng(map.getCenter())
+        .setContent(`
+          <div style="max-width: 250px; font-family: Georgia, serif; font-size: 14px;">
+            <h3 style="margin-top: 0;">👋 Bienvenue, aventuriers !</h3>
+            <p>Explorez le monde de <strong>Telumnia & Elenest</strong>.<br>
+            Cliquez sur les icônes de la carte pour découvrir des lieux mystérieux.</p>
+          </div>
+        `);
+      map.openPopup(welcomePopup);
+    });
+
+    // Déclenche manuellement l'événement 'load' pour que ça marche après fitBounds
+    map.fire('load');
 
     document.getElementById('filter-type').addEventListener('change', function () {
       const selectedType = this.value;
