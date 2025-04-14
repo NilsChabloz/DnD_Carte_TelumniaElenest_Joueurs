@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Carte interactive D&D</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; width: 100vw; }
+    .control-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  gap: 10px;
+}
+
+.control-panel button,
+.control-panel select {
+  padding: 8px 12px;
+  background-color: #f5f0e6;
+  border: 2px solid #7a5c3e;
+  border-radius: 6px;
+  font-family: 'Georgia', serif;
+  font-size: 14px;
+  color: #3b2d1f;
+  cursor: pointer;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease;
+}
+
+.control-panel button:hover,
+.control-panel select:hover {
+  background-color: #e7dbc4;
+}
+    #download-btn { left: 10px; }
+    #filter-type { left: 160px; }
+    .popup-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .popup-form input,
+    .popup-form select,
+    .popup-form textarea {
+      margin-bottom: 4px;
+    }
+    .popup-form button {
+      margin-top: 4px;
+    }
+    .marker-popup h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+    }
+    .marker-popup small,
+    .marker-popup p.note-text {
+      display: block;
+      margin-bottom: 8px;
+      white-space: pre-wrap;
+      font-style: italic;
+      color: #555;
+      font-size: 14px;
+    }
+    .marker-popup p.type-text {
+      margin: 0;
+      font-style: italic;
+      color: #555;
+      font-size: 14px;
+    }
+    .marker-popup button {
+      margin-top: 4px;
+    }
+    .marker-popup textarea,
+    .marker-popup input,
+    .marker-popup select {
+      width: 100%;
+      margin-top: 4px;
+    }
+    body {
+    background-color: #f6f0dc;
+    font-family: 'Georgia', serif;
+  }
+</style>
+</head>
+<body>
+  <div class="control-panel">
+  <button id="download-btn">📥 Télécharger points.json</button>
+  <select id="filter-type">
+    <option value="all">Tous les types</option>
+    <option value="ville">Ville</option>
+    <option value="foret">Forêt</option>
+    <option value="ruine">Ruine</option>
+    <option value="donjon">Donjon</option>
+  </select>
+</div>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const imageUrl = 'Telumnia et Elenest.png';
+    const imageWidth = 2048;
+    const imageHeight = 1182;
+
+    const map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -2,
+    });
+
+    const bounds = [[0, 0], [imageHeight, imageWidth]];
+    L.imageOverlay(imageUrl, bounds).addTo(map);
+    map.fitBounds(bounds);
+
+    const markers = [];
+    let savedPoints = [];
+
+    function getIconForType(type) {
+      const icons = {
+        ville: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
+        foret: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
+        ruine: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
+        donjon: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
+        default: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] })
+      };
+      return icons[type] || icons.default;
+    }
+
+    function createDisplayPopup(point, marker) {
+      const container = document.createElement('div');
+      container.className = 'marker-popup';
+
+      const title = document.createElement('h3');
+      title.innerHTML = `<a href="${point.url}" target="_blank">${point.name}</a>`;
+      container.appendChild(title);
+
+      const typeDisplay = document.createElement('p');
+      typeDisplay.className = 'type-text';
+      typeDisplay.textContent = `Type : ${point.type}`;
+      container.appendChild(typeDisplay);
+
+      const notesDisplay = document.createElement('p');
+      notesDisplay.className = 'note-text';
+      notesDisplay.textContent = point.notes || '';
+      container.appendChild(notesDisplay);
+
+      const editBtn = document.createElement('button');
+      editBtn.textContent = '✏️ Modifier';
+      editBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        marker.bindPopup(createEditablePopup(point, marker)).openPopup();
+      });
+      container.appendChild(editBtn);
+
+      return container;
+    }
+
+    function createEditablePopup(point, marker) {
+      const container = document.createElement('div');
+      container.className = 'marker-popup';
+
+      const inputName = document.createElement('input');
+      inputName.value = point.name;
+      container.appendChild(inputName);
+
+      const inputURL = document.createElement('input');
+      inputURL.value = point.url;
+      container.appendChild(inputURL);
+
+      const selectType = document.createElement('select');
+      const types = ['ville', 'foret', 'ruine', 'donjon'];
+      types.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t;
+        option.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+        if (point.type === t) option.selected = true;
+        selectType.appendChild(option);
+      });
+      container.appendChild(selectType);
+
+      const notesEdit = document.createElement('textarea');
+      notesEdit.value = point.notes || '';
+      container.appendChild(notesEdit);
+
+      const saveBtn = document.createElement('button');
+saveBtn.textContent = '💾 Enregistrer';
+saveBtn.addEventListener('click', (event) => {
+  event.stopPropagation();
+  point.name = inputName.value.trim();
+  point.url = inputURL.value.trim();
+  point.type = selectType.value;
+  point.notes = notesEdit.value.trim();
+
+  marker.setIcon(getIconForType(point.type));
+  marker.setTooltipContent(point.name);
+  marker.bindPopup(createDisplayPopup(point, marker)).openPopup();
+  marker.type = point.type;
+});
+container.appendChild(saveBtn);
+
+const cancelBtn = document.createElement('button');
+cancelBtn.textContent = '❌ Annuler';
+cancelBtn.addEventListener('click', (event) => {
+  event.stopPropagation();
+  marker.bindPopup(createDisplayPopup(point, marker)).openPopup();
+});
+container.appendChild(cancelBtn);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '🗑️ Supprimer';
+      deleteBtn.addEventListener('click', () => {
+        map.removeLayer(marker);
+      });
+      container.appendChild(deleteBtn);
+
+      return container;
+    }
+
+    function addMarker(point) {
+      const icon = getIconForType(point.type);
+      const marker = L.marker(point.pos, { icon, title: point.name }).addTo(map);
+      marker.bindTooltip(point.name);
+      marker.bindPopup(createDisplayPopup(point, marker));
+      marker.type = point.type;
+      markers.push(marker);
+    }
+
+    fetch('points.json')
+      .then(response => response.json())
+      .then(data => {
+        savedPoints = data;
+        data.forEach(addMarker);
+      });
+
+    document.getElementById('filter-type').addEventListener('change', function () {
+      const selectedType = this.value;
+      markers.forEach(marker => {
+        if (selectedType === 'all' || marker.type === selectedType) {
+          marker.addTo(map);
+        } else {
+          map.removeLayer(marker);
+        }
+      });
+    });
+
+    map.on('click', function(e) {
+      const coords = e.latlng;
+
+      const popupContent = document.createElement('div');
+      popupContent.className = 'popup-form';
+
+      const inputName = document.createElement('input');
+      inputName.placeholder = 'Nom du lieu';
+
+      const inputURL = document.createElement('input');
+      inputURL.placeholder = 'Lien vers la page Notion';
+
+      const selectType = document.createElement('select');
+      const types = ['ville', 'foret', 'ruine', 'donjon'];
+      types.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t;
+        option.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+        selectType.appendChild(option);
+      });
+
+      const inputNotes = document.createElement('textarea');
+      inputNotes.placeholder = 'Notes (optionnel)';
+      inputNotes.rows = 3;
+
+      const buttonAdd = document.createElement('button');
+      buttonAdd.textContent = 'Ajouter';
+
+      popupContent.appendChild(inputName);
+      popupContent.appendChild(inputURL);
+      popupContent.appendChild(selectType);
+      popupContent.appendChild(inputNotes);
+      popupContent.appendChild(buttonAdd);
+
+      const popup = L.popup()
+        .setLatLng(coords)
+        .setContent(popupContent)
+        .openOn(map);
+
+      buttonAdd.addEventListener('click', () => {
+        const name = inputName.value.trim();
+        const url = inputURL.value.trim();
+        const type = selectType.value;
+        const notes = inputNotes.value.trim();
+
+        if (name && url) {
+          const point = {
+            name: name,
+            pos: [coords.lat, coords.lng],
+            url: url,
+            type: type,
+            notes: notes
+          };
+
+          addMarker(point);
+          savedPoints.push(point);
+          map.closePopup();
+
+          console.log("À ajouter dans points.json :", JSON.stringify(savedPoints, null, 2));
+        }
+      });
+    });
+
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedPoints, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", "points.json");
+      dlAnchor.click();
+    });
+  </script>
+</body>
+</html>
