@@ -1,38 +1,82 @@
 [
   {
-    "name": "Astarya",
+    "name": "Domaine des Jumeaux",
     "pos": [
-      400,
-      800
+      726,
+      415.8651548079232
     ],
-    "url": "https://notion.so/astarya",
-    "type": "ville"
+    "url": "empty",
+    "type": "ville",
+    "notes": "Le domaine d'origine de Taissa et de Sylvain"
   },
   {
-    "name": "For\u00eat d\u2019Ombremousse",
+    "name": "Astaria",
     "pos": [
-      700,
-      1200
+      551.75,
+      622.2211743973459
     ],
-    "url": "https://notion.so/foret-ombre",
-    "type": "foret"
+    "url": "empty",
+    "type": "ville",
+    "notes": "La ville de départ des aventuriers du ?.\n\nVille d'origine de Phalanges"
   },
   {
-    "name": "Ruines de Nareth",
+    "name": "Syll Tirion",
     "pos": [
-      550,
-      950
+      499,
+      406.0140056600466
     ],
-    "url": "https://notion.so/nareth",
-    "type": "ruine"
+    "url": "Empty",
+    "type": "ruine",
+    "notes": "Les Ruines de l'ancienne cité de Syll Tirion"
   },
   {
-    "name": "Donjon de Brume",
+    "name": "Naübamia",
     "pos": [
-      600,
-      1050
+      516.25,
+      494.61645003311105
     ],
-    "url": "https://notion.so/brume",
-    "type": "donjon"
+    "url": "empty",
+    "type": "ville",
+    "notes": ""
+  },
+  {
+    "name": "Penerya",
+    "pos": [
+      529.5,
+      547.4742279569491
+    ],
+    "url": "Empty",
+    "type": "ville",
+    "notes": "La grande cité majestueuse de Penerya, centre marchand débordant de richesses"
+  },
+  {
+    "name": "Valdara",
+    "pos": [
+      529.875,
+      583.7253679525343
+    ],
+    "url": "Empty",
+    "type": "ville",
+    "notes": "Lac de Valdara"
+  },
+  {
+    "name": "Prairie d'Émeraude",
+    "pos": [
+      476,
+      640.772978022035
+    ],
+    "url": "Empty",
+    "type": "ville",
+    "notes": "Mystérieusement calme et infinie"
+  },
+  {
+    "name": "La Haute Côte",
+    "pos": [
+      588,
+      696.7547380926719
+    ],
+    "url": "Empty",
+    "type": "ville",
+    "notes": ""
   }
 ]
