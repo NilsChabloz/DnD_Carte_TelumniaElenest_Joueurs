@@ -50,16 +50,6 @@
     "notes": "La grande cité majestueuse de Penerya, centre marchand débordant de richesses"
   },
   {
-    "name": "Valdara",
-    "pos": [
-      529.875,
-      583.7253679525343
-    ],
-    "url": "Empty",
-    "type": "ville",
-    "notes": "Lac de Valdara"
-  },
-  {
     "name": "Prairie d'Émeraude",
     "pos": [
       476,
@@ -78,5 +68,15 @@
     "url": "Empty",
     "type": "ville",
     "notes": ""
+  },
+  {
+    "name": "Lac de Valdara",
+    "pos": [
+      534,
+      579.4557030286898
+    ],
+    "url": "Empty",
+    "type": "lac",
+    "notes": "Lac qui fait trembler Phalanges."
   }
 ]
