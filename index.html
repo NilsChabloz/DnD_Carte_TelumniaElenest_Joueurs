@@ -87,11 +87,11 @@
 
     function getIconForType(type) {
       const icons = {
-        ville: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
-        foret: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
-        ruine: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
-        donjon: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] }),
-        default: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] })
+        ville: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -32] }),
+        foret: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -32] }),
+        ruine: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -32] }),
+        donjon: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -32] }),
+        default: L.icon({ iconUrl: 'icons/cross.png', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -32] })
       };
       return icons[type] || icons.default;
     }
